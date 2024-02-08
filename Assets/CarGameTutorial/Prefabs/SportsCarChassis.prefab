@@ -91,7 +91,7 @@ MeshCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2835407652650884854}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: e9ffd68e49bd8fa44a368cb77fc6944f, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -256,10 +256,47 @@ MonoBehaviour:
     applySteering: 0
     applyHandbrake: 1
   motorTorque: 1200
+  reverseMotorTorque: 300
   maxSteerAngle: 30
   brakeTorque: 5000
   COM: {fileID: 2890387212989273314}
   prefabTyreVisual: {fileID: 400000, guid: 01c23e3b42e6f4f44b3311dc6f472cfb, type: 3}
+  forwardSpeed: 0
+  backwardSpeed: 0
+  maxSpeed: 36
+  maxReverseSpeed: 6
+  minRPM: 1000
+  maxRPM: 5000
+  currentRPM: 1000
+  rpmRevDuration: 2.5
+  rpmDampingRatio: 2
+  engineAudio: {fileID: 0}
+  minPitch: 0.5
+  maxPitch: 1.3
+  rpmCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &3526495350215225379
 GameObject:
   m_ObjectHideFlags: 0
