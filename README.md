@@ -1,0 +1,1 @@
+This project is for educational purposes. Assets under the VehiclesTools folder have Unity Companion License. Others assets have Creative Commons License.
