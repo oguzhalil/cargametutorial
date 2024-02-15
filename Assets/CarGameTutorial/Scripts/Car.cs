@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 // throttle - gaz
 // brake - fren
@@ -32,6 +33,20 @@ public class Car : MonoBehaviour
     public float maxPitch = 1.3f;
     public AnimationCurve rpmCurve;
 
+    public Image needle;
+    public Vector3 baseNeedleRot = new Vector3(0f, 0f, 207f);
+    public Vector3 topNeedleRot = new Vector3(0f, 0f, 7f);
+
+    public Image fillNitro;
+    public int nitroInput;
+    public float currentNitro = 100f;
+    public float maxNitro = 100f;
+    public float nitroDuration = 5f;
+    public float nitroRegenerationRatio = 10f;
+    public float nitroStrength = 6f;
+    public AudioSource nitroSFX;
+    public GameObject nitroParticleFXParent;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -53,6 +68,7 @@ public class Car : MonoBehaviour
         int throttleInput = Input.GetKey(KeyCode.W) == true ? 1 : 0;
         int brakeInput = Input.GetKey(KeyCode.S) == true ? 1 : 0;
         int handbrakeInput = Input.GetKey(KeyCode.Space) == true ? 1 : 0;
+        nitroInput = Input.GetKey(KeyCode.LeftShift) == true ? 1 : 0;
         float steerInput = Input.GetAxis("Horizontal");
 
         forwardSpeed = Vector3.Dot(transform.forward, rigidbody.velocity);
@@ -107,14 +123,51 @@ public class Car : MonoBehaviour
 
         currentRPM = Mathf.MoveTowards(currentRPM, maxRPM, (Time.deltaTime / newRPMDuration) * maxRPM * Mathf.Abs(throttleInput));
 
-        if(currentRPM >= maxRPM - 10 && speedFactor < 0.85f)
+        if (currentRPM >= maxRPM - 10 && speedFactor < 0.85f)
             currentRPM = minRPM;
 
         float rpmFactor = Mathf.InverseLerp(minRPM, maxRPM, currentRPM);
         float curvedRPMFactor = rpmCurve.Evaluate(rpmFactor);
         float targetPitch = Mathf.Lerp(minPitch, maxPitch, curvedRPMFactor);
         engineAudio.pitch = Mathf.MoveTowards(engineAudio.pitch, targetPitch, (Time.deltaTime / newRPMDuration) * maxPitch);
+
+        // update needle visuals
+        var targetNeedleRot = Vector3.Lerp(baseNeedleRot, topNeedleRot, curvedRPMFactor);
+        var currentNeedleRot = needle.transform.localRotation.eulerAngles;
+        needle.transform.localRotation = Quaternion.Euler(Vector3.Lerp(currentNeedleRot, targetNeedleRot, Time.deltaTime * newRPMDuration));
+
+
+        // nitro
+
+        currentNitro += Time.deltaTime * nitroRegenerationRatio;
+
+        if (nitroInput > 0)
+        {
+            float nitroUsagePerSec = (maxNitro / nitroDuration);
+            currentNitro -= nitroUsagePerSec * Time.deltaTime;
+
+            nitroParticleFXParent.SetActive(true);
+
+            if (!nitroSFX.isPlaying)
+                nitroSFX.PlayDelayed(.1f);
+        }
+        else
+        {
+            nitroSFX.Stop();
+            nitroParticleFXParent.SetActive(false);
+        }
+
+        fillNitro.fillAmount = currentNitro / maxNitro;
     }
+
+    private void FixedUpdate()
+    {
+        if (nitroInput > 0 && currentNitro > 0f)
+        {
+            rigidbody.AddRelativeForce(Vector3.forward * nitroStrength, ForceMode.Acceleration);
+        }
+    }
+
 
     public float GetRequiredTorque(float speed, float maxSpeed, float maxMotorTorque)
     {
